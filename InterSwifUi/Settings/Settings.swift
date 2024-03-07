@@ -1,51 +1,51 @@
-//
-//  Settings.swift
-//  InterSwifUi
-//
-//  Created by Никита  on 04.03.2024.
-//
-
 import SwiftUI
 
 struct Settings: View {
+    @Environment(\.colorScheme) private var colorScheme
+    @AppStorage("selectedTheme") private var selectedTheme = 0
+    @AppStorage("titleOn") private var titleOn: Bool = true
+    
     var body: some View {
-           NavigationView {
-               Form {
-                   Section(header: Text("Общие настройки")) {
-                       Toggle(isOn: .constant(true), label: {
-                           Text("Включить уведомления")
-                       })
-                       
-                       Picker(selection: .constant(0), label: Text("Выберите тему")) {
-                           Text("Светлая").tag(0)
-                           Text("Темная").tag(1)
-                       }
-                   }
+        NavigationView {
+            Form {
+                Section(header: Text("Общие настройки")) {
+                    Toggle(isOn: $titleOn, label: {
+                        if titleOn {
+                            Text("Заголовки Включены")
+                        }else{
+                            Text("Заголовки Выключены")
+                        }
+                    })
+                    
+                    
 
-                   Section(header: Text("Звук и вибрация")) {
-                       Toggle(isOn: .constant(false), label: {
-                           Text("Включить звук")
-                       })
+                    Picker(selection: $selectedTheme, label: Text("Выберите тему")) {
+                        Text("Светлая").tag(0)
+                        Text("Темная").tag(1)
+                    }
+                    .onChange(of: selectedTheme) { newValue in
+                        UIApplication.shared.windows.first?.rootViewController?.viewDidAppear(true)
+                    }
 
-                       Slider(value: .constant(50), in: 0...100, label: {
-                           Text("Громкость звука")
-                       })
-                   }
+                    Text(verbatim: "Сейчас включена тема \(colorScheme)")
+                }
 
-                   Section(header: Text("Информация")) {
-                       HStack {
-                           Text("Версия приложения")
-                           Spacer()
-                           Text("1.0.0")
-                       }
-                   }
-               }
-               .navigationTitle("Настройки")
-           }
-       }
-   }
+                Section(header: Text("Информация")) {
+                    HStack {
+                        Text("Версия приложения")
+                        Spacer()
+                        Text("1.1.0")
+                    }
+                }
+            }
+            .navigationTitle("Настройки")
+        }
+        .preferredColorScheme(selectedTheme == 0 ? .light : .dark)
+    }
+}
 
-
-#Preview {
-    Settings()
+struct Settings_Previews: PreviewProvider {
+    static var previews: some View {
+        Settings()
+    }
 }
